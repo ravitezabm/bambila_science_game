@@ -86,15 +86,15 @@
         }
 
         .habitats-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            display: flex;
+            justify-content: space-between; /* Space them evenly in a row */
+            flex-wrap: nowrap; /* Prevent wrapping to the next row */
             gap: 20px;
-            justify-items: center;
         }
-
+        
         .habitat {
-            height: 150px; /* Reduced height for better fit */
-            width: 90%; /* Ensure it's not too wide */
+            height: 150px; /* Adjusted height */
+            width: 30%; /* Reduced width to make them fit in a single row */
             border-radius: 15px;
             border: 5px dashed #9c27b0;
             position: relative;
@@ -104,7 +104,7 @@
             justify-content: center;
             align-items: center;
         }
-
+        
         .habitat-label {
             position: absolute;
             bottom: 10px;
@@ -184,6 +184,18 @@
             100% {
                 transform: translateY(calc(100vh + 100px)) rotate(720deg);
                 opacity: 0;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            /* Adjust for medium-sized screens (tablets) */
+            .habitats-container {
+                gap: 5px;
+                grid-template-columns: repeat(2, 1fr);
+            }
+        
+            .habitat {
+                width: 35%; /* Slightly larger for medium screens */
             }
         }
 
