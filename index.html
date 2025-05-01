@@ -87,12 +87,14 @@
 
         .habitats-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
+            justify-items: center;
         }
 
         .habitat {
-            height: 200px;
+            height: 150px; /* Reduced height for better fit */
+            width: 90%; /* Ensure it's not too wide */
             border-radius: 15px;
             border: 5px dashed #9c27b0;
             position: relative;
@@ -109,7 +111,7 @@
             background-color: rgba(255, 255, 255, 0.8);
             padding: 5px 15px;
             border-radius: 20px;
-            font-size: 1.5rem;
+            font-size: 1.2rem; /* Slightly smaller font */
             font-weight: bold;
             color: #673ab7;
         }
@@ -185,53 +187,33 @@
             }
         }
 
-        
-        @media (max-width: 768px) and (orientation: landscape) {
-            .game-container {
-                padding: 10px;
-            }
-        
+        @media (max-width: 768px) {
             h1 {
-                font-size: 1.6rem;
-                margin-bottom: 10px;
+                font-size: 2rem;
             }
-        
-            .instructions {
-                font-size: 0.9rem;
-                padding: 10px;
-                margin-bottom: 15px;
-            }
-        
-            .animals-container {
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                gap: 10px;
-            }
-        
+            
             .animal {
-                width: 60px;
-                height: 60px;
-                flex: 0 0 auto;
+                width: 80px;
+                height: 80px;
             }
-        
+            
             .habitats-container {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr); /* Two per row */
             }
         
             .habitat {
-                height: 120px;
+                height: 120px; /* Further reduce height */
             }
         
             .habitat-label {
-                font-size: 1rem;
+                font-size: 1rem; /* Smaller font size */
             }
-        
-            .reset-btn {
+            
+            .instructions {
                 font-size: 1rem;
-                padding: 10px 20px;
-                margin-top: 20px;
             }
         }
+        
 
         @media (max-width: 480px) {
             h1 {
@@ -246,6 +228,13 @@
             .reset-btn {
                 font-size: 1.2rem;
                 padding: 12px 24px;
+            }
+            .habitats-container {
+                grid-template-columns: 1fr; /* One per row */
+            }
+        
+            .habitat {
+                height: 100px; /* Even smaller height */
             }
         }
     </style>
@@ -372,32 +361,29 @@
             function handleTouchMove(e) {
                 e.preventDefault();
                 if (!draggedItem) return;
-                
+            
                 const touch = e.touches[0];
-                draggedItem.style.left = touch.clientX - touchOffsetX + 'px';
-                draggedItem.style.top = touch.clientY - touchOffsetY + 'px';
+                draggedItem.style.left = (touch.clientX - touchOffsetX) + 'px';
+                draggedItem.style.top = (touch.clientY - touchOffsetY) + 'px';
             }
             
             function handleTouchEnd(e) {
                 e.preventDefault();
                 if (!draggedItem) return;
-                
+            
                 draggedItem.style.opacity = '1';
-                
-                // Check if dropped on a habitat
+                draggedItem.style.position = 'relative';
+                draggedItem.style.left = '0';
+                draggedItem.style.top = '0';
+                draggedItem.style.zIndex = '10';
+            
                 const touch = e.changedTouches[0];
-                const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-                const habitatBelow = elemBelow.closest('.habitat');
-                
-                draggedItem.style.position = '';
-                draggedItem.style.left = '';
-                draggedItem.style.top = '';
-                draggedItem.style.zIndex = '';
-                
-                if (habitatBelow) {
-                    checkMatch(draggedItem.id, habitatBelow.id);
+                const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+                if (dropTarget && dropTarget.classList.contains('habitat')) {
+                    checkMatch(draggedItem.id, dropTarget.id);
                 }
-                
+            
                 draggedItem = null;
             }
             
