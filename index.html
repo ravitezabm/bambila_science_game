@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Habitat Game</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+
+        body {
+            background-color: #e0f7fa;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #673ab7;
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .instructions {
+            background-color: #fffde7;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 3px solid #ffeb3b;
+            font-size: 1.2rem;
+        }
+
+        .game-board {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .animals-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .animal {
+            width: 100px;
+            height: 100px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            filter: drop-shadow(3px 3px 3px rgba(0,0,0,0.3));
+            position: relative;
+            z-index: 10;
+        }
+
+        .animal:hover {
+            transform: scale(1.1);
+        }
+
+        #fish {
+            background-image: url("fish.png");
+        }
+
+        #bird {
+            background-image: url("bird.png");
+        }
+
+        #lion {
+            background-image: url("lion.png");
+        }
+
+        .habitats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .habitat {
+            height: 200px;
+            border-radius: 15px;
+            border: 5px dashed #9c27b0;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .habitat-label {
+            position: absolute;
+            bottom: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #673ab7;
+        }
+
+        #water {
+            background-color: #0288d1;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M0,60 Q25,40 50,60 Q75,80 100,60 L100,100 L0,100 Z' fill='%2303a9f4'/%3E%3Cpath d='M0,70 Q25,50 50,70 Q75,90 100,70 L100,100 L0,100 Z' fill='%230288d1'/%3E%3C/svg%3E");
+        }
+
+        #sky {
+            background-color: #64b5f6;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2381d4fa'/%3E%3Ccircle cx='20' cy='30' r='10' fill='white'/%3E%3Ccircle cx='25' cy='28' r='10' fill='white'/%3E%3Ccircle cx='30' cy='32' r='8' fill='white'/%3E%3Ccircle cx='70' cy='25' r='12' fill='white'/%3E%3Ccircle cx='75' cy='20' r='9' fill='white'/%3E%3Ccircle cx='80' cy='27' r='11' fill='white'/%3E%3C/svg%3E");
+        }
+
+        #land {
+            background-color: #8bc34a;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%238bc34a'/%3E%3Cpath d='M0,60 Q10,58 20,62 Q30,66 40,60 Q50,54 60,58 Q70,62 80,60 Q90,58 100,62 L100,100 L0,100 Z' fill='%23689f38'/%3E%3C/svg%3E");
+        }
+
+        .reset-btn {
+            display: block;
+            margin: 30px auto 0;
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+        }
+
+        .reset-btn:hover {
+            background-color: #e64a19;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .reset-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            display: none;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f44336;
+            border-radius: 50%;
+            animation: fall 4s ease-out forwards;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px)) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        
+        @media (max-width: 768px) and (orientation: landscape) {
+            .game-container {
+                padding: 10px;
+            }
+        
+            h1 {
+                font-size: 1.6rem;
+                margin-bottom: 10px;
+            }
+        
+            .instructions {
+                font-size: 0.9rem;
+                padding: 10px;
+                margin-bottom: 15px;
+            }
+        
+            .animals-container {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                gap: 10px;
+            }
+        
+            .animal {
+                width: 60px;
+                height: 60px;
+                flex: 0 0 auto;
+            }
+        
+            .habitats-container {
+                grid-template-columns: 1fr;
+            }
+        
+            .habitat {
+                height: 120px;
+            }
+        
+            .habitat-label {
+                font-size: 1rem;
+            }
+        
+            .reset-btn {
+                font-size: 1rem;
+                padding: 10px 20px;
+                margin-top: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .animal {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .reset-btn {
+                font-size: 1.2rem;
+                padding: 12px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Match Animals to Habitats</h1>
+        
+        <div class="instructions">
+            Drag the animals to where they live!
+        </div>
+        
+        <div class="game-board">
+            <div class="animals-container">
+                <div class="animal" id="fish" draggable="true"></div>
+                <div class="animal" id="bird" draggable="true"></div>
+                <div class="animal" id="lion" draggable="true"></div>
+            </div>
+            
+            <div class="habitats-container">
+                <div class="habitat" id="water">
+                    <span class="habitat-label">Water</span>
+                </div>
+                <div class="habitat" id="sky">
+                    <span class="habitat-label">Sky</span>
+                </div>
+                <div class="habitat" id="land">
+                    <span class="habitat-label">Land</span>
+                </div>
+            </div>
+        </div>
+        
+        <button class="reset-btn">Play Again</button>
+    </div>
+    
+    <div class="celebration" id="celebration"></div>
+    
+    <!-- Audio elements -->
+    <!-- Replace these comments with actual audio files -->
+    <audio id="correct-sound" src="right.mp3">
+        <!-- Replace with correct sound file -->
+    </audio>
+    <audio id="wrong-sound" src="wrong.mp3">
+        <!-- Replace with wrong sound file -->
+    </audio>
+    <audio id="win-sound" src="victory.mp3">
+        <!-- Replace with win sound file -->
+    </audio>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const animals = document.querySelectorAll('.animal');
+            const habitats = document.querySelectorAll('.habitat');
+            const resetBtn = document.querySelector('.reset-btn');
+            const correctSound = document.getElementById('correct-sound');
+            const wrongSound = document.getElementById('wrong-sound');
+            const winSound = document.getElementById('win-sound');
+            const celebration = document.getElementById('celebration');
+            
+            let draggedItem = null;
+            let correctMatches = 0;
+            const totalMatches = 3;
+            
+            // The correct matches
+            const correctPairings = {
+                'fish': 'water',
+                'bird': 'sky',
+                'lion': 'land'
+            };
+            
+            // Set up drag and drop for desktop
+            animals.forEach(animal => {
+                animal.addEventListener('dragstart', function() {
+                    draggedItem = this;
+                    setTimeout(() => this.style.opacity = '0.5', 0);
+                });
+                
+                animal.addEventListener('dragend', function() {
+                    this.style.opacity = '1';
+                });
+                
+                // For mobile touch events
+                animal.addEventListener('touchstart', handleTouchStart, { passive: false });
+                animal.addEventListener('touchmove', handleTouchMove, { passive: false });
+                animal.addEventListener('touchend', handleTouchEnd, { passive: false });
+            });
+            
+            habitats.forEach(habitat => {
+                habitat.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.style.borderStyle = 'solid';
+                });
+                
+                habitat.addEventListener('dragleave', function() {
+                    this.style.borderStyle = 'dashed';
+                });
+                
+                habitat.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.style.borderStyle = 'dashed';
+                    if (draggedItem) {
+                        checkMatch(draggedItem.id, this.id);
+                    }
+                });
+            });
+            
+            // Touch event handlers for mobile
+            let touchOffsetX, touchOffsetY;
+            
+            function handleTouchStart(e) {
+                e.preventDefault();
+                draggedItem = this;
+                this.style.opacity = '0.5';
+                
+                const touch = e.touches[0];
+                const rect = this.getBoundingClientRect();
+                touchOffsetX = touch.clientX - rect.left;
+                touchOffsetY = touch.clientY - rect.top;
+                
+                this.style.position = 'fixed';
+                this.style.zIndex = '1000';
+            }
+            
+            function handleTouchMove(e) {
+                e.preventDefault();
+                if (!draggedItem) return;
+                
+                const touch = e.touches[0];
+                draggedItem.style.left = touch.clientX - touchOffsetX + 'px';
+                draggedItem.style.top = touch.clientY - touchOffsetY + 'px';
+            }
+            
+            function handleTouchEnd(e) {
+                e.preventDefault();
+                if (!draggedItem) return;
+                
+                draggedItem.style.opacity = '1';
+                
+                // Check if dropped on a habitat
+                const touch = e.changedTouches[0];
+                const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+                const habitatBelow = elemBelow.closest('.habitat');
+                
+                draggedItem.style.position = '';
+                draggedItem.style.left = '';
+                draggedItem.style.top = '';
+                draggedItem.style.zIndex = '';
+                
+                if (habitatBelow) {
+                    checkMatch(draggedItem.id, habitatBelow.id);
+                }
+                
+                draggedItem = null;
+            }
+            
+            function checkMatch(animalId, habitatId) {
+                if (correctPairings[animalId] === habitatId) {
+                    // Correct match!
+                    const animalElem = document.getElementById(animalId);
+                    animalElem.style.pointerEvents = 'none';
+                    animalElem.style.opacity = '1';
+                    
+                    const habitatElem = document.getElementById(habitatId);
+                    habitatElem.appendChild(animalElem);
+                    
+                    // Reset position for touch devices
+                    animalElem.style.position = 'absolute';
+                    animalElem.style.left = '50%';
+                    animalElem.style.top = '40%';
+                    animalElem.style.transform = 'translate(-50%, -50%)';
+                    
+                    // Play sound
+                    if (correctSound.src) {
+                        correctSound.play();
+                    }
+                    
+                    // Create small celebration
+                    createSmallCelebration(habitatElem);
+                    
+                    correctMatches++;
+                    
+                    // Check if all matches are done
+                    if (correctMatches === totalMatches) {
+                        setTimeout(() => {
+                            // Play win sound
+                            if (winSound.src) {
+                                winSound.play();
+                            }
+                            
+                            // Create big celebration
+                            createBigCelebration();
+                        }, 500);
+                    }
+                } else {
+                    // Wrong match
+                    if (wrongSound.src) {
+                        wrongSound.play();
+                    }
+                    animateWrongMatch(document.getElementById(animalId));
+                }
+            }
+            
+            function animateWrongMatch(element) {
+                element.style.transition = 'transform 0.1s ease-in-out';
+                element.style.transform = 'translateX(-5px)';
+                
+                setTimeout(() => {
+                    element.style.transform = 'translateX(5px)';
+                }, 100);
+                
+                setTimeout(() => {
+                    element.style.transform = 'translateX(-5px)';
+                }, 200);
+                
+                setTimeout(() => {
+                    element.style.transform = 'translateX(0)';
+                }, 300);
+            }
+            
+            function createSmallCelebration(element) {
+                const rect = element.getBoundingClientRect();
+                const x = rect.x + rect.width / 2;
+                const y = rect.y + rect.height / 2;
+                
+                for (let i = 0; i < 10; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'confetti';
+                    star.style.left = x + 'px';
+                    star.style.top = y + 'px';
+                    star.style.backgroundColor = getRandomColor();
+                    star.style.transform = `scale(${Math.random() * 1 + 0.5})`;
+                    document.body.appendChild(star);
+                    
+                    setTimeout(() => {
+                        star.remove();
+                    }, 1000);
+                    
+                    gsAnimate(star, {
+                        x: (Math.random() - 0.5) * 100,
+                        y: (Math.random() - 0.5) * 100,
+                        opacity: 0,
+                        duration: 1.5
+                    });
+                }
+            }
+            
+            function createBigCelebration() {
+                celebration.style.display = 'block';
+                
+                for (let i = 0; i < 50; i++) {
+                    setTimeout(() => {
+                        const confetti = document.createElement('div');
+                        confetti.classList.add('confetti');
+                        confetti.style.left = Math.random() * 100 + 'vw';
+                        confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                        confetti.style.backgroundColor = getRandomColor();
+                        
+                        celebration.appendChild(confetti);
+                        
+                        setTimeout(() => {
+                            confetti.remove();
+                        }, 4000);
+                    }, i * 50);
+                }
+                
+                setTimeout(() => {
+                    celebration.style.display = 'none';
+                    celebration.innerHTML = '';
+                }, 4000);
+            }
+            
+            function getRandomColor() {
+                const colors = ['#f44336', '#2196f3', '#ffeb3b', '#4caf50', '#9c27b0', '#ff9800'];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+            
+            // Simple animation function (GSAP-like)
+            function gsAnimate(element, options) {
+                const start = performance.now();
+                const duration = options.duration || 1;
+                const startX = 0;
+                const startY = 0;
+                const startOpacity = 1;
+                
+                function animate(time) {
+                    const elapsed = (time - start) / 1000;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    if (options.x !== undefined) {
+                        element.style.transform = `translate(${startX + options.x * progress}px, ${startY + (options.y || 0) * progress}px)`;
+                    }
+                    
+                    if (options.opacity !== undefined) {
+                        element.style.opacity = startOpacity + (options.opacity - startOpacity) * progress;
+                    }
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    }
+                }
+                
+                requestAnimationFrame(animate);
+            }
+            
+            // Reset button
+            resetBtn.addEventListener('click', function() {
+                resetGame();
+            });
+            
+            function resetGame() {
+                correctMatches = 0;
+                
+                animals.forEach(animal => {
+                    // Reset all animal styles
+                    animal.style.opacity = '1';
+                    animal.style.pointerEvents = 'auto';
+                    animal.style.position = '';
+                    animal.style.left = '';
+                    animal.style.top = '';
+                    animal.style.transform = '';
+                    animal.style.zIndex = '';
+                    
+                    // Move back to animals container
+                    document.querySelector('.animals-container').appendChild(animal);
+                });
+                
+                // Clear celebration
+                celebration.style.display = 'none';
+                celebration.innerHTML = '';
+            }
+        });
+    </script>
+</body>
+</html>
